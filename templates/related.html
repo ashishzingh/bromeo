@@ -1,0 +1,72 @@
+{% extends "layouts/base.html" %}
+{% block heading %}Video{% endblock %}
+{% block content %}
+    <script type="text/javascript" src="/static/js/pagination.js"></script>
+    <div class="row">
+        <div class="col-md-8">
+            <iframe width="700" height="480" src="{{ url_for_vid(vid=video.videoInfo.id) }}" frameborder="0"
+                    allowfullscreen></iframe>
+        </div>
+        <div class="col-sm-4 blog-sidebar">
+            <div class="sidebar-module sidebar-module-inset">
+                <center>
+                    <div class="paging-container" id="tablePaging"></div>
+                </center>
+                <div id="search_results">
+                    {% for result in results %}
+                        <div class="double">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <a href="{{ url_for('related', video_id=result.videoInfo.id) }}">
+                                        <img class="img-responsive"
+                                             src="{{ result.videoInfo.snippet.thumbnails.high.url }}" alt="">
+                                    </a>
+                                </div>
+                                <div class="col-md-5">
+                                    <a href="{{ url_for('related', video_id=result.videoInfo.id) }}">
+                                        <h5>{{ result.videoInfo.snippet.title }}</h5>
+                                    </a>
+                                    <a href="{{ url_for_search(query=result.videoInfo.snippet.channelTitle) }}">
+                                        <h6>{{ result.videoInfo.snippet.channelTitle }}</h6>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div><!-- /.blog-sidebar -->
+        </div>
+    </div>
+    <div class="row description">
+        <div class="col-md-8">
+            <a href="{{ url_for('related', video_id=video.videoInfo.id) }}">
+                <h3>{{ video.videoInfo.snippet.title }}</h3>
+            </a>
+            <a href="{{ url_for_search(query=video.videoInfo.snippet.channelTitle) }}">
+                <h4>{{ video.videoInfo.snippet.channelTitle }}</h4>
+            </a>
+            <p>{{ video.videoInfo.snippet.description }}</p>
+        </div>
+    </div>
+    <script type=text/javascript>
+        $(function () {
+            var load = function () {
+                window.tp = new Pagination('#tablePaging', {
+                    itemsCount: {{ results|length }},
+                    pageRange: [3],
+                    onPageChange: function (paging) {
+                        var start = paging.pageSize * (paging.currentPage - 1),
+                            end = start + paging.pageSize,
+                            $rows = $('#search_results').find('.double');
+                        $rows.hide();
+                        for (var i = start; i < end; i++) {
+                            $rows.eq(i).show();
+                        }
+                    }
+                });
+            };
+            load();
+        });
+    </script>
+
+{% endblock %}

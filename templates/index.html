@@ -1,0 +1,43 @@
+{% extends "layouts/base.html" %}
+{% block heading %}Trending Videos{% endblock %}
+{% block content %}
+    <script type="text/javascript" src="/static/js/pagination.js"></script>
+    <div id="trending" class="row">
+        {% for result in results %}
+            <div class="col-sm-3 col-xs-6">
+                <a href="{{ url_for('related', video_id=result.videoInfo.id) }}">
+                    <img class="img-responsive portfolio-item"
+                         src="{{ result.videoInfo.snippet.thumbnails.medium.url }}"
+                         alt="">
+                    <h5>{{ result.videoInfo.snippet.title }}</h5>
+                </a>
+                <a href="{{ url_for_search(query=result.videoInfo.snippet.channelTitle) }}">
+                    <h6>{{ result.videoInfo.snippet.channelTitle }}</h6>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+    <center>
+        <div class="paging-container" id="tablePaging"></div>
+    </center>
+    <script type=text/javascript>
+        $(function () {
+            var load = function () {
+                window.tp = new Pagination('#tablePaging', {
+                    itemsCount: {{ results|length }},
+                    pageRange: [8],
+                    onPageChange: function (paging) {
+                        var start = paging.pageSize * (paging.currentPage - 1),
+                            end = start + paging.pageSize,
+                            $rows = $('#trending').find('.col-sm-3');
+                        $rows.hide();
+                        for (var i = start; i < end; i++) {
+                            $rows.eq(i).show();
+                        }
+                    }
+                });
+            };
+            load();
+        });
+    </script>
+{% endblock %}
